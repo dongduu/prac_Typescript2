@@ -3,16 +3,29 @@ type Store = {
   feeds: NewsFeed[];
 };
 
-type NewsFeed = {
+type News = {
   id: number;
-  comments_count: number;
+  time_age: string;
+  title: string;
   url: string;
   user: string;
-  time_ago: string;
+  content: string;
+}
+
+type NewsFeed = News & {
+  comments_count: number;
   points: number;
-  title: string;
   read?: boolean;
 };
+
+type NewsDetail = News & {
+  comments: NewsComment[];
+}
+
+type NewsComment = News & {
+  comments: NewsComment[];
+  level: number; 
+}
 
 const container: HTMLElement | null = document.getElementById("root");
 const ajax: XMLHttpRequest = new XMLHttpRequest();
@@ -24,7 +37,7 @@ const store: Store = {
   feeds: [],
 };
 
-function getData(url) {
+function getData(url):  {
   ajax.open("GET", url, false);
   ajax.send();
 

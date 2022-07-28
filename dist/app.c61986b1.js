@@ -127,12 +127,9 @@ var store = {
   currentPage: 1,
   feeds: []
 };
-
-function getData(url) {
-  ajax.open("GET", url, false);
-  ajax.send();
-  return JSON.parse(ajax.response);
-}
+ajax.open("GET", url, false);
+ajax.send();
+return JSON.parse(ajax.response);
 
 function makeFeeds(feeds) {
   for (var i = 0; i < feeds.length; i++) {
