@@ -46,11 +46,11 @@ class Api {
     this.ajax = new XMLHttpRequest();
   }
 
-  getRequest<AjaxResponse>(): AjaxResponse {
+  protected getRequest<AjaxResponse>(): AjaxResponse {
     this.ajax.open("GET", this.url, false);
     this.ajax.send();
 
-    return JSON.parse(ajax.response);
+    return JSON.parse(this.ajax.response);
   }
 }
 
@@ -75,6 +75,7 @@ function makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
 }
 
 function newsFeed(): void {
+  const api = new NewsFeedApi(NEWS_URL);
   let newsFeed: NewsFeed[] = store.feeds;
   const newsList = [];
   let template = `
@@ -99,7 +100,7 @@ function newsFeed(): void {
       `;
 
   if (newsFeed.length === 0) {
-    newsFeed = store.feeds = makeFeeds(getData<NewsFeed[]>(NEWS_URL));
+    newsFeed = store.feeds = makeFeeds(api.getData());
     console.log(store.feeds);
   }
 
@@ -146,7 +147,8 @@ function newsFeed(): void {
 
 function newsDetail(): void {
   const id = location.hash.substr(7);
-  const newsContent = getData<NewsDetail>(CONTENTS_URL.replace("@id", id));
+  const api = new NewsDetailApi(CONTENTS_URL.replace("@id", id));
+  const newsContent = api.getData();
   let template = `
       <div class="bg-gray-600 min-h-screen pb-8">
         <div class="bg-white text-xl">
