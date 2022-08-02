@@ -83,7 +83,28 @@ interface NewsDetailApi extends Api {}
 applyApiMixins(NewsFeedApi, [Api]);
 applyApiMixins(NewsDetailApi, [Api]);
 
-class NewsFeedView {
+
+class View {
+  template: string;
+  container: HTMLElement;
+
+  constructor(containerId: string, template: string) {
+    const containerElement = document.getElementById(containerId);
+
+    if(!containerElement) {
+      throw '최상위 컨테이너가 없어 UI를 진행할 수 없습니다.'
+    }
+
+    this.container = containerElement;
+    this.template = template
+  }
+
+  updateView(html: string): void {
+    this.container.innerHTML = html;
+  }
+}
+
+class NewsFeedView extends View {
   constructor() {
     const api = new NewsFeedApi();
     let newsFeed: NewsFeed[] = store.feeds;
@@ -165,7 +186,7 @@ class NewsFeedView {
   }
 }
 
-class NewsDetailView {
+class NewsDetailView extends View {
   constructor() {
     let template = `
         <div class="bg-gray-600 min-h-screen pb-8">
