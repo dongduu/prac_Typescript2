@@ -152,27 +152,25 @@ class NewsFeedView extends View {
   }
   render(): void {
     for (i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
+      const { id, title, comments_count, user, points, time_ago, read } =
+        this.feeds[i];
       this.addHtml(`
         <div class="p-6 ${
-          newsFeed[i].read ? "bg-green-100" : "bg-white"
+          read ? "bg-green-100" : "bg-white"
         } mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
           <div class="flex">
             <div class="flex-auto">
-              <a href="#/show/${newsFeed[i].id}">${newsFeed[i].title}</a>
+              <a href="#/show/${id}">${title}</a>
             </div>
             <div class="text-center text-sm">
-              <div class="w-10 text-white bg-green-300 rounded-lg px-0 py-2">${
-                newsFeed[i].comments_count
-              }</div>
+              <div class="w-10 text-white bg-green-300 rounded-lg px-0 py-2">${comments_count}</div>
             </div>
           </div>
           <div class="flex mt-3">
             <div class="grid grid-cols-3 text-sm text-gray-500">
-              <div><i class="fas fa-user mr-1"></i>${newsFeed[i].user}</div>
-              <div><i class="fas fa-heart mr-1"></i>${newsFeed[i].points}</div>
-              <div><i class="fas fa-clock mr-1"></i>${
-                newsFeed[i].time_ago
-              }</div>
+              <div><i class="fas fa-user mr-1"></i>${user}</div>
+              <div><i class="fas fa-heart mr-1"></i>${points}</div>
+              <div><i class="fas fa-clock mr-1"></i>${time_ago}</div>
             </div>
           </div>
         </div>
@@ -200,7 +198,7 @@ class NewsFeedView extends View {
 }
 
 class NewsDetailView extends View {
-  constructor() {
+  constructor(containerId: string) {
     let template = `
         <div class="bg-gray-600 min-h-screen pb-8">
           <div class="bg-white text-xl">
@@ -230,6 +228,8 @@ class NewsDetailView extends View {
           </div>
         </div>
         `;
+
+    super(containerId, template);
   }
 
   render() {
@@ -244,9 +244,11 @@ class NewsDetailView extends View {
       }
     }
 
-    container.innerHTML = template.replace(
-      "{{__comments__}}",
-      makeComment(newsContent.comments)
+    this.updateView(
+      template.replace(
+        "{{__comments__}}",
+        this.makeComment(newsDetail.comments)
+      )
     );
   }
 
