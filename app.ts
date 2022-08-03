@@ -83,7 +83,6 @@ interface NewsDetailApi extends Api {}
 applyApiMixins(NewsFeedApi, [Api]);
 applyApiMixins(NewsDetailApi, [Api]);
 
-
 class View {
   template: string;
   container: HTMLElement;
@@ -91,12 +90,12 @@ class View {
   constructor(containerId: string, template: string) {
     const containerElement = document.getElementById(containerId);
 
-    if(!containerElement) {
-      throw '최상위 컨테이너가 없어 UI를 진행할 수 없습니다.'
+    if (!containerElement) {
+      throw "최상위 컨테이너가 없어 UI를 진행할 수 없습니다.";
     }
 
     this.container = containerElement;
-    this.template = template
+    this.template = template;
   }
 
   updateView(html: string): void {
@@ -105,9 +104,10 @@ class View {
 }
 
 class NewsFeedView extends View {
-  constructor() {
-    const api = new NewsFeedApi();
-    let newsFeed: NewsFeed[] = store.feeds;
+  api: NewsFeedApi;
+  feeds: NewsFeed[];
+
+  constructor(containerId: string) {
     let template = `
         <div class="bg-gray-600 min-h-screen">
           <div class="bg-white text-xl">
@@ -129,11 +129,16 @@ class NewsFeedView extends View {
         </div>
       `;
 
-    if (newsFeed.length === 0) {
-      newsFeed = store.feeds = makeFeeds(api.getData());
+    super(containerId, template);
+
+    this.api = new NewsFeedApi();
+    this.feeds = store.feeds;
+
+    if (this.feeds.length === 0) {
+      this.feeds = store.feeds = this.makeFeeds(this.api.getData());
       console.log(store.feeds);
     }
-
+  }
   render(): void {
     const newsList = [];
     for (i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
@@ -176,12 +181,12 @@ class NewsFeedView extends View {
 
     container.innerHTML = template;
   }
-  
+
   makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
     for (let i = 0; i < feeds.length; i++) {
       feeds[i].read = false;
     }
-  
+
     return feeds;
   }
 }
@@ -218,7 +223,7 @@ class NewsDetailView extends View {
         </div>
         `;
   }
-  
+
   render() {
     const id = location.hash.substr(7);
     const api = new NewsDetailApi();
@@ -230,7 +235,7 @@ class NewsDetailView extends View {
         break;
       }
     }
-  
+
     container.innerHTML = template.replace(
       "{{__comments__}}",
       makeComment(newsContent.comments)
@@ -239,7 +244,7 @@ class NewsDetailView extends View {
 
   makeComment(comments: NewsComment[]): string {
     const commentString = [];
-  
+
     for (let i = 0; i < comments.length; i++) {
       const comment: NewsComment = comments[i];
       commentString.push(`
@@ -251,12 +256,12 @@ class NewsDetailView extends View {
                 <p class="text-gray-700">${comment.content}</p>
               </div>
             `);
-  
+
       if (comments[i].comments.length > 0) {
         commentString.push(makeComment(comment.comments));
       }
     }
-  
+
     return commentString.join("");
   }
 }
@@ -272,8 +277,6 @@ function router(): void {
     newsDetail();
   }
 }
-
-
 
 window.addEventListener("hashchange", router);
 
