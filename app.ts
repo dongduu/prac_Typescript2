@@ -85,6 +85,7 @@ applyApiMixins(NewsDetailApi, [Api]);
 
 class View {
   template: string;
+  renderTemplate: string;
   container: HTMLElement;
   htmlList: string[];
 
@@ -97,11 +98,13 @@ class View {
 
     this.container = containerElement;
     this.template = template;
+    this.renderTemplate = template;
     this.htmlList = [];
   }
 
   updateView(): void {
-    this.container.innerHTML = this.template;
+    this.container.innerHTML = this.renderTemplate;
+    this.renderTemplate = this.template;
   }
 
   addHtml(htmlString: string): void {
@@ -113,7 +116,7 @@ class View {
   }
 
   setTemplateData(key: string, value: string): void {
-    this.template = this.template.replace(`{{__${key}}}`, value);
+    this.renderTemplate = this.renderTemplate.replace(`{{__${key}}}`, value);
   }
 }
 
