@@ -100,8 +100,8 @@ class View {
     this.htmlList = [];
   }
 
-  updateView(html: string): void {
-    this.container.innerHTML = html;
+  updateView(): void {
+    this.container.innerHTML = this.template;
   }
 
   addHtml(htmlString: string): void {
@@ -110,6 +110,10 @@ class View {
 
   getHtml(): string {
     return this.htmlList.join("");
+  }
+
+  setTemplateData(key: string, value: string): void {
+    this.template = this.template.replace(`{{__${key}}}`, value);
   }
 }
 
@@ -177,17 +181,14 @@ class NewsFeedView extends View {
       `);
     }
 
-    template = template.replace("{{__news_feed__}}", this.getHtml());
-    template = template.replace(
-      "{{__prev_page__}}",
+    this.setTemplateData("news_feed", this.getHtml());
+    this.setTemplateData(
+      "prev_page",
       String(store.currentPage > 1 ? store.currentPage - 1 : 1)
     );
-    template = template.replace(
-      "{{__next_page__}}",
-      String(store.currentPage + 1)
-    );
+    this.setTemplateData("next_page", String(store.currentPage + 1));
 
-    container.innerHTML = template;
+    this.updateView(template);
   }
 
   makeFeeds(): void {
@@ -208,7 +209,7 @@ class NewsDetailView extends View {
                   <h1 class="font-extrabold">Hacker News</h1>
                 </div>
                 <div class="items-center justify-end">
-                  <a herf="#/page/${store.currentPage}" class="text-gray-500">
+                  <a herf="#/page/{{__currentPage__}}" class="text-gray-500">
                     <i class="fa fa-times"></i>
                   </a>
                 </div>
@@ -217,9 +218,9 @@ class NewsDetailView extends View {
           </div>
       
           <div class="h-full border rounded-xl bg-white m-6 p-4">
-            <h2>${newsContent.title}</h2>
+            <h2>{{__title__}}</h2>
             <div class="text-gray-400 h-20">
-              ${newsContent.content}
+              {{__content__}}
             </div>
       
             {{__comments__}}
@@ -235,7 +236,7 @@ class NewsDetailView extends View {
   render() {
     const id = location.hash.substr(7);
     const api = new NewsDetailApi();
-    const newsContent = api.getData(id);
+    const newsDetail = api.getData(id);
 
     for (let i = 0; i < store.feeds.length; i++) {
       if (store.feeds[i].id === Number(id)) {
@@ -244,12 +245,11 @@ class NewsDetailView extends View {
       }
     }
 
-    this.updateView(
-      template.replace(
-        "{{__comments__}}",
-        this.makeComment(newsDetail.comments)
-      )
-    );
+    this.setTemplateData("comments", this.makeComment(newsDetail.comments));
+    this.setTemplateData("currentPage", String(store.currentPage));
+    this.setTemplateData("title", newsDetail.title);
+    this.setTemplateData("content", newsDetail.content);
+    this.updateView();
   }
 
   makeComment(comments: NewsComment[]): string {
