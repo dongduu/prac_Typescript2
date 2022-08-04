@@ -112,11 +112,17 @@ class View {
   }
 
   getHtml(): string {
-    return this.htmlList.join("");
+    const snapshot = this.htmlList.join("");
+    this.clearHtmlList();
+    return snapshot;
   }
 
   setTemplateData(key: string, value: string): void {
     this.renderTemplate = this.renderTemplate.replace(`{{__${key}}}`, value);
+  }
+
+  clearHtmlList(): void {
+    this.htmlList = [];
   }
 }
 
@@ -191,7 +197,7 @@ class NewsFeedView extends View {
     );
     this.setTemplateData("next_page", String(store.currentPage + 1));
 
-    this.updateView(template);
+    this.updateView();
   }
 
   makeFeeds(): void {
