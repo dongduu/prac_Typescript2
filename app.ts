@@ -27,6 +27,11 @@ interface NewsComment extends News {
   readonly level: number;
 }
 
+interface RouteInfo {
+  path: string;
+  page: View;
+}
+
 const container: HTMLElement | null = document.getElementById("root");
 const ajax: XMLHttpRequest = new XMLHttpRequest();
 const content = document.createElement("div");
@@ -127,19 +132,24 @@ class View {
 }
 
 class Router {
+  routeTable: RouteInfo[];
+  defaultRoute: RouteInfo | null;
+
   constructor() {
     const routePath = location.hash;
 
     window.addEventListener("hashchange", router);
 
-    if (routePath === "") {
-      newsFeed();
-    } else if (routePath.indexOf("#/page/") >= 0) {
-      store.currentPage = Number(routePath.substr(7));
-      newsFeed();
-    } else {
-      newsDetail();
-    }
+    this.routeTable = [];
+    this.defaultRoute = null;
+  }
+
+  setDefaultPage(page: View): void {
+    this.defaultRoute = { path: "", page };
+  }
+
+  addRoutePath(path: string, page: View): void {
+    this.routeTable.push({ path, page });
   }
 }
 
