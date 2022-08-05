@@ -126,6 +126,23 @@ class View {
   }
 }
 
+class Router {
+  constructor() {
+    const routePath = location.hash;
+
+    window.addEventListener("hashchange", router);
+
+    if (routePath === "") {
+      newsFeed();
+    } else if (routePath.indexOf("#/page/") >= 0) {
+      store.currentPage = Number(routePath.substr(7));
+      newsFeed();
+    } else {
+      newsDetail();
+    }
+  }
+}
+
 class NewsFeedView extends View {
   api: NewsFeedApi;
   feeds: NewsFeed[];
@@ -284,18 +301,10 @@ class NewsDetailView extends View {
   }
 }
 
-function router(): void {
-  const routePath = location.hash;
-  if (routePath === "") {
-    newsFeed();
-  } else if (routePath.indexOf("#/page/") >= 0) {
-    store.currentPage = Number(routePath.substr(7));
-    newsFeed();
-  } else {
-    newsDetail();
-  }
-}
+const router: Router = new Router();
+const newsFeedView = new NewsFeedView("root");
+const NewsDetailView = new NewsDetailView("root");
 
-window.addEventListener("hashchange", router);
-
-router();
+router.setDefaultPage(newsFeedView);
+router.addRoutePath("/page/", newsFeedView);
+router.addRoutePath("/show/", newsDetailView);
