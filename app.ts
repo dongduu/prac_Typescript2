@@ -88,7 +88,7 @@ interface NewsDetailApi extends Api {}
 applyApiMixins(NewsFeedApi, [Api]);
 applyApiMixins(NewsDetailApi, [Api]);
 
-class View {
+abstract class View {
   template: string;
   renderTemplate: string;
   container: HTMLElement;
@@ -129,6 +129,8 @@ class View {
   clearHtmlList(): void {
     this.htmlList = [];
   }
+
+  abstract render(): void;
 }
 
 class Router {
@@ -136,8 +138,6 @@ class Router {
   defaultRoute: RouteInfo | null;
 
   constructor() {
-    const routePath = location.hash;
-
     window.addEventListener("hashchange", router);
 
     this.routeTable = [];
@@ -150,6 +150,21 @@ class Router {
 
   addRoutePath(path: string, page: View): void {
     this.routeTable.push({ path, page });
+  }
+
+  route() {
+    const routePath = location.hash;
+
+    if (routePath === "" && this.defaultRoute) {
+      this.defaultRoute.page.render();
+    }
+
+    for (const routeInfo of this.routeTable) {
+      if (routePath.indexOf(routeInfo.path) >= 0) {
+        routeInfo.page.render();
+        break;
+      }
+    }
   }
 }
 
