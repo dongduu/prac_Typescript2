@@ -89,10 +89,10 @@ applyApiMixins(NewsFeedApi, [Api]);
 applyApiMixins(NewsDetailApi, [Api]);
 
 abstract class View {
-  template: string;
-  renderTemplate: string;
-  container: HTMLElement;
-  htmlList: string[];
+  private template: string;
+  private renderTemplate: string;
+  private container: HTMLElement;
+  private htmlList: string[];
 
   constructor(containerId: string, template: string) {
     const containerElement = document.getElementById(containerId);
@@ -107,26 +107,26 @@ abstract class View {
     this.htmlList = [];
   }
 
-  updateView(): void {
+  protected updateView(): void {
     this.container.innerHTML = this.renderTemplate;
     this.renderTemplate = this.template;
   }
 
-  addHtml(htmlString: string): void {
+  protected addHtml(htmlString: string): void {
     this.htmlList.push(htmlString);
   }
 
-  getHtml(): string {
+  protected getHtml(): string {
     const snapshot = this.htmlList.join("");
     this.clearHtmlList();
     return snapshot;
   }
 
-  setTemplateData(key: string, value: string): void {
+  protected setTemplateData(key: string, value: string): void {
     this.renderTemplate = this.renderTemplate.replace(`{{__${key}}}`, value);
   }
 
-  clearHtmlList(): void {
+  protected clearHtmlList(): void {
     this.htmlList = [];
   }
 
@@ -169,8 +169,8 @@ class Router {
 }
 
 class NewsFeedView extends View {
-  api: NewsFeedApi;
-  feeds: NewsFeed[];
+  private api: NewsFeedApi;
+  private feeds: NewsFeed[];
 
   constructor(containerId: string) {
     let template = `
@@ -248,7 +248,7 @@ class NewsFeedView extends View {
     this.updateView();
   }
 
-  makeFeeds(): void {
+  private makeFeeds(): void {
     for (let i = 0; i < this.feeds.length; i++) {
       this.feeds[i].read = false;
     }
