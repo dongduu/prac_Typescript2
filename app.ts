@@ -32,9 +32,10 @@ interface RouteInfo {
   page: View;
 }
 
-const container: HTMLElement | null = document.getElementById("root");
-const ajax: XMLHttpRequest = new XMLHttpRequest();
-const content = document.createElement("div");
+// const container: HTMLElement | null = document.getElementById("root");
+// const ajax: XMLHttpRequest = new XMLHttpRequest();
+// const content = document.createElement("div");
+
 const NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
 const CONTENTS_URL = `http://api.hnpwa.com/v0/item/@id.json`;
 const store: Store = {
@@ -42,51 +43,52 @@ const store: Store = {
   feeds: [],
 };
 
-function applyApiMixins(targetClass: any, baseClasses: any[]): void {
-  baseClasses.forEach((baseClass) => {
-    Object.getOwnPropertyNames(baseClass.prototype).forEach((name) => {
-      const descriptor = Object.getOwnPropertyDescriptor(
-        baseClass.prototype,
-        name
-      );
+// function applyApiMixins(targetClass: any, baseClasses: any[]): void {
+//   baseClasses.forEach((baseClass) => {
+//     Object.getOwnPropertyNames(baseClass.prototype).forEach((name) => {
+//       const descriptor = Object.getOwnPropertyDescriptor(
+//         baseClass.prototype,
+//         name
+//       );
 
-      if (descriptor) {
-        Object.defineProperty(targetClass.prototype, name, descriptor);
-      }
-    });
-  });
-}
+//       if (descriptor) {
+//         Object.defineProperty(targetClass.prototype, name, descriptor);
+//       }
+//     });
+//   });
+// }
 
 class Api {
   url: string;
   ajax: XMLHttpRequest;
 
-  getRequest<AjaxResponse>(url: string): AjaxResponse {
-    const ajax = new XMLHttpRequest();
-    ajax.open("GET", url, false);
-    ajax.send();
+  constructor(url: string) {
+    this.ajax = new XMLHttpRequest();
+    this.url = url;
+  }
 
-    return JSON.parse(ajax.response);
+  getRequest<AjaxResponse>(): AjaxResponse {
+    this.ajax.open("GET", this.url, false);
+    this.ajax.send();
+
+    return JSON.parse(this.ajax.response);
   }
 }
 
-class NewsFeedApi {
+class NewsFeedApi extends Api {
   getData(): NewsFeed[] {
-    return this.getRequest<NewsFeed[]>(NEWS_URL);
+    return this.getRequest<NewsFeed[]>();
   }
 }
 
-class NewsDetailApi {
-  getData(id: string): NewsDetail {
-    return this.getRequest<NewsDetail>(CONTENTS_URL.replace("@id", id));
+class NewsDetailApi extends Api {
+  getData(): NewsDetail {
+    return this.getRequest<NewsDetail>();
   }
 }
 
-interface NewsFeedApi extends Api {}
-interface NewsDetailApi extends Api {}
-
-applyApiMixins(NewsFeedApi, [Api]);
-applyApiMixins(NewsDetailApi, [Api]);
+// interface NewsFeedApi extends Api {}
+// interface NewsDetailApi extends Api {}
 
 abstract class View {
   private template: string;
@@ -138,7 +140,7 @@ class Router {
   defaultRoute: RouteInfo | null;
 
   constructor() {
-    window.addEventListener("hashchange", this.route);
+    window.addEventListener("hashchange", this.route.bind(this));
 
     this.routeTable = [];
     this.defaultRoute = null;
@@ -173,7 +175,7 @@ class NewsFeedView extends View {
   private feeds: NewsFeed[];
 
   constructor(containerId: string) {
-    let template = `
+    let template: string = `
         <div class="bg-gray-600 min-h-screen">
           <div class="bg-white text-xl">
             <div class="mx-auto px-4">
@@ -196,7 +198,7 @@ class NewsFeedView extends View {
 
     super(containerId, template);
 
-    this.api = new NewsFeedApi();
+    this.api = new NewsFeedApi(NEWS_URL);
     this.feeds = store.feeds;
 
     if (this.feeds.length === 0) {
@@ -205,6 +207,7 @@ class NewsFeedView extends View {
       console.log(store.feeds);
     }
   }
+
   render(): void {
     store.currentPage = Number(location.hash.substr(7) || 1);
 
@@ -293,7 +296,7 @@ class NewsDetailView extends View {
   render() {
     const id = location.hash.substr(7);
     const api = new NewsDetailApi(CONTENTS_URL.replace("@id", id));
-    const newsDetail: NewsDetail[] = api.getData(id);
+    const newsDetail: NewsDetail = api.getData();
 
     for (let i = 0; i < store.feeds.length; i++) {
       if (store.feeds[i].id === Number(id)) {

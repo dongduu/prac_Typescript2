@@ -144,40 +144,42 @@ var __extends = this && this.__extends || function () {
 
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
   };
-}();
+}(); // const container: HTMLElement | null = document.getElementById("root");
+// const ajax: XMLHttpRequest = new XMLHttpRequest();
+// const content = document.createElement("div");
 
-var container = document.getElementById("root");
-var ajax = new XMLHttpRequest();
-var content = document.createElement("div");
+
 var NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
 var CONTENTS_URL = "http://api.hnpwa.com/v0/item/@id.json";
 var store = {
   currentPage: 1,
   feeds: []
-};
-
-function applyApiMixins(targetClass, baseClasses) {
-  baseClasses.forEach(function (baseClass) {
-    Object.getOwnPropertyNames(baseClass.prototype).forEach(function (name) {
-      var descriptor = Object.getOwnPropertyDescriptor(baseClass.prototype, name);
-
-      if (descriptor) {
-        Object.defineProperty(targetClass.prototype, name, descriptor);
-      }
-    });
-  });
-}
+}; // function applyApiMixins(targetClass: any, baseClasses: any[]): void {
+//   baseClasses.forEach((baseClass) => {
+//     Object.getOwnPropertyNames(baseClass.prototype).forEach((name) => {
+//       const descriptor = Object.getOwnPropertyDescriptor(
+//         baseClass.prototype,
+//         name
+//       );
+//       if (descriptor) {
+//         Object.defineProperty(targetClass.prototype, name, descriptor);
+//       }
+//     });
+//   });
+// }
 
 var Api =
 /** @class */
 function () {
-  function Api() {}
+  function Api(url) {
+    this.ajax = new XMLHttpRequest();
+    this.url = url;
+  }
 
-  Api.prototype.getRequest = function (url) {
-    var ajax = new XMLHttpRequest();
-    ajax.open("GET", url, false);
-    ajax.send();
-    return JSON.parse(ajax.response);
+  Api.prototype.getRequest = function () {
+    this.ajax.open("GET", this.url, false);
+    this.ajax.send();
+    return JSON.parse(this.ajax.response);
   };
 
   return Api;
@@ -185,30 +187,37 @@ function () {
 
 var NewsFeedApi =
 /** @class */
-function () {
-  function NewsFeedApi() {}
+function (_super) {
+  __extends(NewsFeedApi, _super);
+
+  function NewsFeedApi() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
 
   NewsFeedApi.prototype.getData = function () {
-    return this.getRequest(NEWS_URL);
+    return this.getRequest();
   };
 
   return NewsFeedApi;
-}();
+}(Api);
 
 var NewsDetailApi =
 /** @class */
-function () {
-  function NewsDetailApi() {}
+function (_super) {
+  __extends(NewsDetailApi, _super);
 
-  NewsDetailApi.prototype.getData = function (id) {
-    return this.getRequest(CONTENTS_URL.replace("@id", id));
+  function NewsDetailApi() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
+
+  NewsDetailApi.prototype.getData = function () {
+    return this.getRequest();
   };
 
   return NewsDetailApi;
-}();
+}(Api); // interface NewsFeedApi extends Api {}
+// interface NewsDetailApi extends Api {}
 
-applyApiMixins(NewsFeedApi, [Api]);
-applyApiMixins(NewsDetailApi, [Api]);
 
 var View =
 /** @class */
@@ -256,7 +265,7 @@ var Router =
 /** @class */
 function () {
   function Router() {
-    window.addEventListener("hashchange", this.route);
+    window.addEventListener("hashchange", this.route.bind(this));
     this.routeTable = [];
     this.defaultRoute = null;
   }
@@ -305,7 +314,7 @@ function (_super) {
 
     var template = "\n        <div class=\"bg-gray-600 min-h-screen\">\n          <div class=\"bg-white text-xl\">\n            <div class=\"mx-auto px-4\">\n              <div class=\"flex justify-between items-center py-6\">\n                  <div class=\"flex justify-start\">\n                    <h1 class=\"font-extrabold\">Hacker News</h1>\n                  </div>\n                  <div class=\"items-center justify-end\">\n                    <a href=\"#/page/{{__prev_page__}}\" class=\"text-gray-500\">Previous</a>\n                    <a href=\"#/page/{{__next_page__}}\" class=\"text-gray-500 ml-4\">Next</a>\n                  </div>\n              </div>\n            </div>\n          </div>\n          <div class=\"p-4 text-2xl text-gray-700\">\n          {{__news_feed__}}\n          </div>\n        </div>\n      ";
     _this = _super.call(this, containerId, template) || this;
-    _this.api = new NewsFeedApi();
+    _this.api = new NewsFeedApi(NEWS_URL);
     _this.feeds = store.feeds;
 
     if (_this.feeds.length === 0) {
@@ -362,7 +371,7 @@ function (_super) {
   NewsDetailView.prototype.render = function () {
     var id = location.hash.substr(7);
     var api = new NewsDetailApi(CONTENTS_URL.replace("@id", id));
-    var newsDetail = api.getData(id);
+    var newsDetail = api.getData();
 
     for (var i = 0; i < store.feeds.length; i++) {
       if (store.feeds[i].id === Number(id)) {
@@ -429,7 +438,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62469" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54404" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
