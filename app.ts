@@ -138,7 +138,7 @@ class Router {
   defaultRoute: RouteInfo | null;
 
   constructor() {
-    window.addEventListener("hashchange", router);
+    window.addEventListener("hashchange", this.route);
 
     this.routeTable = [];
     this.defaultRoute = null;
@@ -206,7 +206,11 @@ class NewsFeedView extends View {
     }
   }
   render(): void {
-    for (i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
+    for (
+      let i = (store.currentPage - 1) * 10;
+      i < store.currentPage * 10;
+      i++
+    ) {
       const { id, title, comments_count, user, points, time_ago, read } =
         this.feeds[i];
       this.addHtml(`
@@ -333,3 +337,5 @@ const newsDetailView = new NewsDetailView("root");
 router.setDefaultPage(newsFeedView);
 router.addRoutePath("/page/", newsFeedView);
 router.addRoutePath("/show/", newsDetailView);
+
+router.route();
