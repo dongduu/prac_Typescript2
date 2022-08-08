@@ -320,6 +320,8 @@ function (_super) {
   }
 
   NewsFeedView.prototype.render = function () {
+    store.currentPage = Number(location.hash.substr(7) || 1);
+
     for (var i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
       var _a = this.feeds[i],
           id = _a.id,
@@ -359,7 +361,7 @@ function (_super) {
 
   NewsDetailView.prototype.render = function () {
     var id = location.hash.substr(7);
-    var api = new NewsDetailApi();
+    var api = new NewsDetailApi(CONTENTS_URL.replace("@id", id));
     var newsDetail = api.getData(id);
 
     for (var i = 0; i < store.feeds.length; i++) {

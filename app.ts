@@ -206,6 +206,8 @@ class NewsFeedView extends View {
     }
   }
   render(): void {
+    store.currentPage = Number(location.hash.substr(7) || 1);
+
     for (
       let i = (store.currentPage - 1) * 10;
       i < store.currentPage * 10;
@@ -290,8 +292,8 @@ class NewsDetailView extends View {
 
   render() {
     const id = location.hash.substr(7);
-    const api = new NewsDetailApi();
-    const newsDetail = api.getData(id);
+    const api = new NewsDetailApi(CONTENTS_URL.replace("@id", id));
+    const newsDetail: NewsDetail[] = api.getData(id);
 
     for (let i = 0; i < store.feeds.length; i++) {
       if (store.feeds[i].id === Number(id)) {
