@@ -1,29 +1,34 @@
-class NewsFeedView extends View {
+import View from "../core/veiw";
+import { NewsFeedApi } from "../core/api";
+import { NewsFeed } from "../types";
+import { NEWS_URL } from "../config";
+
+const template: string = `
+<div class="bg-gray-600 min-h-screen">
+  <div class="bg-white text-xl">
+    <div class="mx-auto px-4">
+      <div class="flex justify-between items-center py-6">
+          <div class="flex justify-start">
+            <h1 class="font-extrabold">Hacker News</h1>
+          </div>
+          <div class="items-center justify-end">
+            <a href="#/page/{{__prev_page__}}" class="text-gray-500">Previous</a>
+            <a href="#/page/{{__next_page__}}" class="text-gray-500 ml-4">Next</a>
+          </div>
+      </div>
+    </div>
+  </div>
+  <div class="p-4 text-2xl text-gray-700">
+  {{__news_feed__}}
+  </div>
+</div>
+`;
+
+export default class NewsFeedView extends View {
   private api: NewsFeedApi;
   private feeds: NewsFeed[];
 
   constructor(containerId: string) {
-    let template: string = `
-          <div class="bg-gray-600 min-h-screen">
-            <div class="bg-white text-xl">
-              <div class="mx-auto px-4">
-                <div class="flex justify-between items-center py-6">
-                    <div class="flex justify-start">
-                      <h1 class="font-extrabold">Hacker News</h1>
-                    </div>
-                    <div class="items-center justify-end">
-                      <a href="#/page/{{__prev_page__}}" class="text-gray-500">Previous</a>
-                      <a href="#/page/{{__next_page__}}" class="text-gray-500 ml-4">Next</a>
-                    </div>
-                </div>
-              </div>
-            </div>
-            <div class="p-4 text-2xl text-gray-700">
-            {{__news_feed__}}
-            </div>
-          </div>
-        `;
-
     super(containerId, template);
 
     this.api = new NewsFeedApi(NEWS_URL);
