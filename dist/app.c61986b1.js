@@ -144,29 +144,14 @@ var __extends = this && this.__extends || function () {
 
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
   };
-}(); // const container: HTMLElement | null = document.getElementById("root");
-// const ajax: XMLHttpRequest = new XMLHttpRequest();
-// const content = document.createElement("div");
-
+}();
 
 var NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
-var CONTENTS_URL = "http://api.hnpwa.com/v0/item/@id.json";
+var CONTENT_URL = "http://api.hnpwa.com/v0/item/@id.json";
 var store = {
   currentPage: 1,
   feeds: []
-}; // function applyApiMixins(targetClass: any, baseClasses: any[]): void {
-//   baseClasses.forEach((baseClass) => {
-//     Object.getOwnPropertyNames(baseClass.prototype).forEach((name) => {
-//       const descriptor = Object.getOwnPropertyDescriptor(
-//         baseClass.prototype,
-//         name
-//       );
-//       if (descriptor) {
-//         Object.defineProperty(targetClass.prototype, name, descriptor);
-//       }
-//     });
-//   });
-// }
+};
 
 var Api =
 /** @class */
@@ -215,9 +200,7 @@ function (_super) {
   };
 
   return NewsDetailApi;
-}(Api); // interface NewsFeedApi extends Api {}
-// interface NewsDetailApi extends Api {}
-
+}(Api);
 
 var View =
 /** @class */
@@ -251,7 +234,7 @@ function () {
   };
 
   View.prototype.setTemplateData = function (key, value) {
-    this.renderTemplate = this.renderTemplate.replace("{{__".concat(key, "}}"), value);
+    this.renderTemplate = this.renderTemplate.replace("{{__".concat(key, "__}}"), value);
   };
 
   View.prototype.clearHtmlList = function () {
@@ -370,7 +353,7 @@ function (_super) {
 
   NewsDetailView.prototype.render = function () {
     var id = location.hash.substr(7);
-    var api = new NewsDetailApi(CONTENTS_URL.replace("@id", id));
+    var api = new NewsDetailApi(CONTENT_URL.replace("@id", id));
     var newsDetail = api.getData();
 
     for (var i = 0; i < store.feeds.length; i++) {
@@ -392,7 +375,7 @@ function (_super) {
       var comment = comments[i];
       this.addHtml("\n              <div style=\"padding-left: ".concat(comment.level * 40, "px;\" class=\"mt-4\">\n                <div class=\"text-gray-400\">\n                  <i class=\"fa fa-sort-up mr-2\"></i>\n                  <strong>").concat(comment.user, "</strong> ").concat(comment.time_ago, "\n                </div>\n                <p class=\"text-gray-700\">").concat(comment.content, "</p>\n              </div>\n            "));
 
-      if (comments[i].comments.length > 0) {
+      if (comment.comments.length > 0) {
         this.addHtml(this.makeComment(comment.comments));
       }
     }
@@ -438,7 +421,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54404" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62399" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

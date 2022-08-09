@@ -32,31 +32,12 @@ interface RouteInfo {
   page: View;
 }
 
-// const container: HTMLElement | null = document.getElementById("root");
-// const ajax: XMLHttpRequest = new XMLHttpRequest();
-// const content = document.createElement("div");
-
 const NEWS_URL = "https://api.hnpwa.com/v0/news/1.json";
-const CONTENTS_URL = `http://api.hnpwa.com/v0/item/@id.json`;
+const CONTENT_URL = "http://api.hnpwa.com/v0/item/@id.json";
 const store: Store = {
   currentPage: 1,
   feeds: [],
 };
-
-// function applyApiMixins(targetClass: any, baseClasses: any[]): void {
-//   baseClasses.forEach((baseClass) => {
-//     Object.getOwnPropertyNames(baseClass.prototype).forEach((name) => {
-//       const descriptor = Object.getOwnPropertyDescriptor(
-//         baseClass.prototype,
-//         name
-//       );
-
-//       if (descriptor) {
-//         Object.defineProperty(targetClass.prototype, name, descriptor);
-//       }
-//     });
-//   });
-// }
 
 class Api {
   url: string;
@@ -86,9 +67,6 @@ class NewsDetailApi extends Api {
     return this.getRequest<NewsDetail>();
   }
 }
-
-// interface NewsFeedApi extends Api {}
-// interface NewsDetailApi extends Api {}
 
 abstract class View {
   private template: string;
@@ -125,7 +103,7 @@ abstract class View {
   }
 
   protected setTemplateData(key: string, value: string): void {
-    this.renderTemplate = this.renderTemplate.replace(`{{__${key}}}`, value);
+    this.renderTemplate = this.renderTemplate.replace(`{{__${key}__}}`, value);
   }
 
   protected clearHtmlList(): void {
@@ -295,7 +273,7 @@ class NewsDetailView extends View {
 
   render() {
     const id = location.hash.substr(7);
-    const api = new NewsDetailApi(CONTENTS_URL.replace("@id", id));
+    const api = new NewsDetailApi(CONTENT_URL.replace("@id", id));
     const newsDetail: NewsDetail = api.getData();
 
     for (let i = 0; i < store.feeds.length; i++) {
@@ -326,7 +304,7 @@ class NewsDetailView extends View {
               </div>
             `);
 
-      if (comments[i].comments.length > 0) {
+      if (comment.comments.length > 0) {
         this.addHtml(this.makeComment(comment.comments));
       }
     }
