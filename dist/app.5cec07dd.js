@@ -380,15 +380,15 @@ function (_super) {
     var api = new api_1.NewsDetailApi(config_1.CONTENT_URL.replace("@id", id));
     var newsDetail = api.getData();
 
-    for (var i = 0; i < store.feeds.length; i++) {
-      if (store.feeds[i].id === Number(id)) {
-        store.feeds[i].read = true;
+    for (var i = 0; i < window.store.feeds.length; i++) {
+      if (window.store.feeds[i].id === Number(id)) {
+        window.store.feeds[i].read = true;
         break;
       }
     }
 
     this.setTemplateData("comments", this.makeComment(newsDetail.comments));
-    this.setTemplateData("currentPage", String(store.currentPage));
+    this.setTemplateData("currentPage", String(window.store.currentPage));
     this.setTemplateData("title", newsDetail.title);
     this.setTemplateData("content", newsDetail.content);
     this.updateView();
@@ -469,23 +469,23 @@ function (_super) {
     var _this = _super.call(this, containerId, template) || this;
 
     _this.api = new api_1.NewsFeedApi(config_1.NEWS_URL);
-    _this.feeds = store.feeds;
+    _this.feeds = window.store.feeds;
 
     if (_this.feeds.length === 0) {
-      _this.feeds = store.feeds = _this.api.getData();
+      _this.feeds = window.store.feeds = _this.api.getData();
 
       _this.makeFeeds();
 
-      console.log(store.feeds);
+      console.log(window.store.feeds);
     }
 
     return _this;
   }
 
   NewsFeedView.prototype.render = function () {
-    store.currentPage = Number(location.hash.substr(7) || 1);
+    window.store.currentPage = Number(location.hash.substr(7) || 1);
 
-    for (var i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
+    for (var i = (window.store.currentPage - 1) * 10; i < window.store.currentPage * 10; i++) {
       var _a = this.feeds[i],
           id = _a.id,
           title = _a.title,
@@ -498,8 +498,8 @@ function (_super) {
     }
 
     this.setTemplateData("news_feed", this.getHtml());
-    this.setTemplateData("prev_page", String(store.currentPage > 1 ? store.currentPage - 1 : 1));
-    this.setTemplateData("next_page", String(store.currentPage + 1));
+    this.setTemplateData("prev_page", String(window.store.currentPage > 1 ? window.store.currentPage - 1 : 1));
+    this.setTemplateData("next_page", String(window.store.currentPage + 1));
     this.updateView();
   };
 
@@ -565,6 +565,7 @@ var store = {
   currentPage: 1,
   feeds: []
 };
+window.store = store;
 var router = new router_1.default();
 var newsFeedView = new page_1.NewsFeedView("root");
 var newsDetailView = new page_1.NewsDetailView("root");
@@ -600,7 +601,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62399" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56040" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
