@@ -2,19 +2,19 @@ import { NewsFeed, NewsDetail } from "../types";
 
 export class Api {
   url: string;
-  ajax: XMLHttpRequest;
+  xhr: XMLHttpRequest;
 
   constructor(url: string) {
-    this.ajax = new XMLHttpRequest();
+    this.xhr = new XMLHttpRequest();
     this.url = url;
   }
 
-  getRequest<AjaxResponse>(cb: (data: AjaxResponse) => void): AjaxResponse {
-    this.ajax.open("GET", this.url);
-    this.ajax.addEventListener("load", () => {
-      cb(JSON.parse(this.ajax.response));
+  getRequestWithXHR<AjaxResponse>(cb: (data: AjaxResponse) => void): void {
+    this.xhr.open("GET", this.url);
+    this.xhr.addEventListener("load", () => {
+      cb(JSON.parse(this.xhr.response) as AjaxResponse);
     });
-    this.ajax.send();
+    this.xhr.send();
 
     return;
   }
@@ -26,7 +26,7 @@ export class NewsFeedApi extends Api {
   }
 
   getData(cb: (data: NewsFeed[]) => void): void {
-    return this.getRequest<NewsFeed[]>(cb);
+    return this.getRequestWithXHR<NewsFeed[]>(cb);
   }
 }
 

@@ -258,18 +258,18 @@ var Api =
 /** @class */
 function () {
   function Api(url) {
-    this.ajax = new XMLHttpRequest();
+    this.xhr = new XMLHttpRequest();
     this.url = url;
   }
 
-  Api.prototype.getRequest = function (cb) {
+  Api.prototype.getRequestWithXHR = function (cb) {
     var _this = this;
 
-    this.ajax.open("GET", this.url);
-    this.ajax.addEventListener("load", function () {
-      cb(JSON.parse(_this.ajax.response));
+    this.xhr.open("GET", this.url);
+    this.xhr.addEventListener("load", function () {
+      cb(JSON.parse(_this.xhr.response));
     });
-    this.ajax.send();
+    this.xhr.send();
     return;
   };
 
@@ -288,7 +288,7 @@ function (_super) {
   }
 
   NewsFeedApi.prototype.getData = function (cb) {
-    return this.getRequest(cb);
+    return this.getRequestWithXHR(cb);
   };
 
   return NewsFeedApi;
