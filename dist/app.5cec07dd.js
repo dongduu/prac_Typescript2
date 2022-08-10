@@ -262,10 +262,15 @@ function () {
     this.url = url;
   }
 
-  Api.prototype.getRequest = function () {
-    this.ajax.open("GET", this.url, false);
+  Api.prototype.getRequest = function (cb) {
+    var _this = this;
+
+    this.ajax.open("GET", this.url);
+    this.ajax.addEventListener("load", function () {
+      cb(JSON.parse(_this.ajax.response));
+    });
     this.ajax.send();
-    return JSON.parse(this.ajax.response);
+    return;
   };
 
   return Api;
@@ -278,12 +283,12 @@ var NewsFeedApi =
 function (_super) {
   __extends(NewsFeedApi, _super);
 
-  function NewsFeedApi() {
-    return _super !== null && _super.apply(this, arguments) || this;
+  function NewsFeedApi(url) {
+    return _super.call(this, url) || this;
   }
 
-  NewsFeedApi.prototype.getData = function () {
-    return this.getRequest();
+  NewsFeedApi.prototype.getData = function (cb) {
+    return this.getRequest(cb);
   };
 
   return NewsFeedApi;
@@ -296,12 +301,12 @@ var NewsDetailApi =
 function (_super) {
   __extends(NewsDetailApi, _super);
 
-  function NewsDetailApi() {
-    return _super !== null && _super.apply(this, arguments) || this;
+  function NewsDetailApi(url) {
+    return _super.call(this, url) || this;
   }
 
-  NewsDetailApi.prototype.getData = function () {
-    return this.getRequest();
+  NewsDetailApi.prototype.getData = function (cb) {
+    return this.getRequest(cb);
   };
 
   return NewsDetailApi;
@@ -379,15 +384,27 @@ function (_super) {
   }
 
   NewsDetailView.prototype.render = function () {
+    var _this = this;
+
     var id = location.hash.substr(7);
     var api = new api_1.NewsDetailApi(config_1.CONTENT_URL.replace("@id", id));
-    var newsDetail = api.getData();
-    this.store.makeRead(Number(id));
-    this.setTemplateData("comments", this.makeComment(newsDetail.comments));
-    this.setTemplateData("currentPage", String(this.store.currentPage));
-    this.setTemplateData("title", newsDetail.title);
-    this.setTemplateData("content", newsDetail.content);
-    this.updateView();
+    api.getData(function (data) {
+      var title = data.title,
+          content = data.content,
+          comments = data.comments;
+
+      _this.store.makeRead(Number(id));
+
+      _this.setTemplateData("comments", _this.makeComment(comments));
+
+      _this.setTemplateData("currentPage", String(_this.store.currentPage));
+
+      _this.setTemplateData("title", title);
+
+      _this.setTemplateData("content", content);
+
+      _this.updateView();
+    });
   };
 
   NewsDetailView.prototype.makeComment = function (comments) {
@@ -464,36 +481,48 @@ function (_super) {
   function NewsFeedView(containerId, store) {
     var _this = _super.call(this, containerId, template) || this;
 
+    _this.renderView = function () {
+      for (var i = (_this.store.currentPage - 1) * 10; i < _this.store.currentPage * 10; i++) {
+        var _a = _this.store.getFeed(i),
+            id = _a.id,
+            title = _a.title,
+            comments_count = _a.comments_count,
+            user = _a.user,
+            points = _a.points,
+            time_ago = _a.time_ago,
+            read = _a.read;
+
+        _this.addHtml("\n          <div class=\"p-6 ".concat(read ? "bg-green-100" : "bg-white", " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n            <div class=\"flex\">\n              <div class=\"flex-auto\">\n                <a href=\"#/show/").concat(id, "\">").concat(title, "</a>\n              </div>\n              <div class=\"text-center text-sm\">\n                <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">").concat(comments_count, "</div>\n              </div>\n            </div>\n            <div class=\"flex mt-3\">\n              <div class=\"grid grid-cols-3 text-sm text-gray-500\">\n                <div><i class=\"fas fa-user mr-1\"></i>").concat(user, "</div>\n                <div><i class=\"fas fa-heart mr-1\"></i>").concat(points, "</div>\n                <div><i class=\"fas fa-clock mr-1\"></i>").concat(time_ago, "</div>\n              </div>\n            </div>\n          </div>\n        "));
+      }
+
+      _this.setTemplateData("news_feed", _this.getHtml());
+
+      _this.setTemplateData("prev_page", String(_this.store.prevPage));
+
+      _this.setTemplateData("next_page", String(_this.store.nextPage));
+
+      _this.updateView();
+    };
+
     _this.store = store;
     _this.api = new api_1.NewsFeedApi(config_1.NEWS_URL);
-
-    if (_this.store.hasFeeds) {
-      _this.store.setFeeds(_this.api.getData());
-    }
-
     return _this;
   }
 
   NewsFeedView.prototype.render = function () {
+    var _this = this;
+
     this.store.currentPage = Number(location.hash.substr(7) || 1);
 
-    for (var i = (this.store.currentPage - 1) * 10; i < this.store.currentPage * 10; i++) {
-      var _a = this.store.getFeed(i),
-          id = _a.id,
-          title = _a.title,
-          comments_count = _a.comments_count,
-          user = _a.user,
-          points = _a.points,
-          time_ago = _a.time_ago,
-          read = _a.read;
+    if (this.store.hasFeeds) {
+      this.api.getData(function (feeds) {
+        _this.store.setFeeds(feeds);
 
-      this.addHtml("\n          <div class=\"p-6 ".concat(read ? "bg-green-100" : "bg-white", " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n            <div class=\"flex\">\n              <div class=\"flex-auto\">\n                <a href=\"#/show/").concat(id, "\">").concat(title, "</a>\n              </div>\n              <div class=\"text-center text-sm\">\n                <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">").concat(comments_count, "</div>\n              </div>\n            </div>\n            <div class=\"flex mt-3\">\n              <div class=\"grid grid-cols-3 text-sm text-gray-500\">\n                <div><i class=\"fas fa-user mr-1\"></i>").concat(user, "</div>\n                <div><i class=\"fas fa-heart mr-1\"></i>").concat(points, "</div>\n                <div><i class=\"fas fa-clock mr-1\"></i>").concat(time_ago, "</div>\n              </div>\n            </div>\n          </div>\n        "));
+        _this.renderView();
+      });
     }
 
-    this.setTemplateData("news_feed", this.getHtml());
-    this.setTemplateData("prev_page", String(this.store.prevPage));
-    this.setTemplateData("next_page", String(this.store.nextPage));
-    this.updateView();
+    this.renderView();
   };
 
   return NewsFeedView;
@@ -687,7 +716,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63811" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64803" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
