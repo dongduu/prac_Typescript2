@@ -18,6 +18,15 @@ export class Api {
 
     return;
   }
+
+  getRequestWithPromise<AjaxResponse>(cb: (data: AjaxResponse) => void): void {
+    fetch(this.url)
+      .then((res) => res.json())
+      .then(cb)
+      .catch(() => {
+        console.log("데이터를 불러오지 못했습니다.");
+      });
+  }
 }
 
 export class NewsFeedApi extends Api {
@@ -25,8 +34,12 @@ export class NewsFeedApi extends Api {
     super(url);
   }
 
-  getData(cb: (data: NewsFeed[]) => void): void {
+  getDataWithXHR(cb: (data: NewsFeed[]) => void): void {
     return this.getRequestWithXHR<NewsFeed[]>(cb);
+  }
+
+  getDataWithPromise(cb: (data: NewsFeed[]) => void): void {
+    return this.getRequestWithPromise<NewsFeed[]>(cb);
   }
 }
 
@@ -35,7 +48,11 @@ export class NewsDetailApi extends Api {
     super(url);
   }
 
-  getData(cb: (data: NewsDetail) => void): void {
+  getDataWithXHR(cb: (data: NewsDetail) => void): void {
     return this.getRequestWithXHR<NewsDetail>(cb);
+  }
+
+  getDataWithPromise(cb: (data: NewsDetail) => void): void {
+    return this.getRequestWithPromise<NewsDetail>(cb);
   }
 }

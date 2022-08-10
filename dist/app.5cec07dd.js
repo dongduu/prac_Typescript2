@@ -273,6 +273,14 @@ function () {
     return;
   };
 
+  Api.prototype.getRequestWithPromise = function (cb) {
+    fetch(this.url).then(function (res) {
+      return res.json();
+    }).then(cb).catch(function () {
+      console.log("데이터를 불러오지 못했습니다.");
+    });
+  };
+
   return Api;
 }();
 
@@ -287,8 +295,12 @@ function (_super) {
     return _super.call(this, url) || this;
   }
 
-  NewsFeedApi.prototype.getData = function (cb) {
+  NewsFeedApi.prototype.getDataWithXHR = function (cb) {
     return this.getRequestWithXHR(cb);
+  };
+
+  NewsFeedApi.prototype.getDataWithPromise = function (cb) {
+    return this.getRequestWithPromise(cb);
   };
 
   return NewsFeedApi;
@@ -305,8 +317,12 @@ function (_super) {
     return _super.call(this, url) || this;
   }
 
-  NewsDetailApi.prototype.getData = function (cb) {
+  NewsDetailApi.prototype.getDataWithXHR = function (cb) {
     return this.getRequestWithXHR(cb);
+  };
+
+  NewsDetailApi.prototype.getDataWithPromise = function (cb) {
+    return this.getRequestWithPromise(cb);
   };
 
   return NewsDetailApi;
@@ -388,7 +404,7 @@ function (_super) {
 
     var id = location.hash.substr(7);
     var api = new api_1.NewsDetailApi(config_1.CONTENT_URL.replace("@id", id));
-    api.getData(function (data) {
+    api.getDataWithPromise(function (data) {
       var title = data.title,
           content = data.content,
           comments = data.comments;
@@ -515,7 +531,7 @@ function (_super) {
     this.store.currentPage = Number(location.hash.substr(7) || 1);
 
     if (this.store.hasFeeds) {
-      this.api.getData(function (feeds) {
+      this.api.getDataWithPromise(function (feeds) {
         _this.store.setFeeds(feeds);
 
         _this.renderView();
