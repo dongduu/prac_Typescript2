@@ -553,6 +553,7 @@ var __assign = this && this.__assign || function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Store = void 0;
 
 var Store =
 /** @class */
@@ -588,21 +589,21 @@ function () {
   });
   Object.defineProperty(Store.prototype, "numberOfFeed", {
     get: function get() {
-      return this.feed.length;
+      return this.feeds.length;
     },
     enumerable: false,
     configurable: true
   });
-  Object.defineProperty(Store.prototype, "hasFeed", {
+  Object.defineProperty(Store.prototype, "hasFeeds", {
     get: function get() {
-      return this.feed.length > 0;
+      return this.feeds.length > 0;
     },
     enumerable: false,
     configurable: true
   });
 
   Store.prototype.getAllFeeds = function () {
-    return this.feed;
+    return this.feeds;
   };
 
   Store.prototype.getFeed = function (position) {
@@ -630,7 +631,7 @@ function () {
   return Store;
 }();
 
-exports.default = Store;
+exports.Store = Store;
 },{}],"src/app.ts":[function(require,module,exports) {
 "use strict";
 
@@ -648,9 +649,9 @@ var router_1 = __importDefault(require("./core/router"));
 
 var page_1 = require("./page");
 
-var store_1 = __importDefault(require("./store"));
+var store_1 = require("./store");
 
-var store = new store_1.default();
+var store = new store_1.Store();
 var router = new router_1.default();
 var newsFeedView = new page_1.NewsFeedView("root", store);
 var newsDetailView = new page_1.NewsDetailView("root", store);
@@ -686,7 +687,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57020" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63811" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

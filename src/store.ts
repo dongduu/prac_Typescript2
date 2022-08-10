@@ -1,6 +1,6 @@
 import { NewsFeed, NewsStore } from "./types";
 
-export default class Store implements NewsStore {
+export class Store implements NewsStore {
   private feeds: NewsFeed[];
   private _currentPage: number;
 
@@ -26,15 +26,15 @@ export default class Store implements NewsStore {
   }
 
   get numberOfFeed(): number {
-    return this.feed.length;
+    return this.feeds.length;
   }
 
-  get hasFeed(): boolean {
-    return this.feed.length > 0;
+  get hasFeeds(): boolean {
+    return this.feeds.length > 0;
   }
 
   getAllFeeds(): NewsFeed[] {
-    return this.feed;
+    return this.feeds;
   }
 
   getFeed(position: number): NewsFeed {

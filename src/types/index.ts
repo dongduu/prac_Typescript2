@@ -12,11 +12,6 @@ export interface NewsStore {
   prevPage: number;
 }
 
-export interface Store {
-  currentPage: number;
-  feeds: NewsFeed[];
-}
-
 export interface News {
   readonly id: number;
   readonly time_ago: string;
