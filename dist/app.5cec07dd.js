@@ -306,7 +306,7 @@ function (_super) {
   }
 
   NewsDetailApi.prototype.getData = function (cb) {
-    return this.getRequest(cb);
+    return this.getRequestWithXHR(cb);
   };
 
   return NewsDetailApi;

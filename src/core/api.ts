@@ -36,6 +36,6 @@ export class NewsDetailApi extends Api {
   }
 
   getData(cb: (data: NewsDetail) => void): void {
-    return this.getRequest<NewsDetail>(cb);
+    return this.getRequestWithXHR<NewsDetail>(cb);
   }
 }
